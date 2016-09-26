@@ -1,6 +1,6 @@
 import json
 import requests
-from urllib import quote
+from urllib.parse import quote
 from functools import partial
 
 from . exceptions import (
@@ -8,7 +8,7 @@ from . exceptions import (
     DeserializationError,
     PostRequestError,
     MailChimpException,
-    )
+)
 
 
 class PostMonkey(object):
@@ -45,6 +45,7 @@ class PostMonkey(object):
           JSON.
 
     """
+
     def __init__(self,
                  apikey='',
                  endpoint=None,
@@ -87,7 +88,7 @@ class PostMonkey(object):
 
         try:
             resp = self.postrequest(url, data=payload, headers=headers)
-        except Exception, e:
+        except Exception as e:
             raise PostRequestError(e)
 
         decoded = self._deserialize_response(resp.text)
@@ -144,13 +145,14 @@ class PostMonkey(object):
         elif 'code' in response and 'error' in response:
             raise MailChimpException(response['code'], response['error'])
 
+
 def postmonkey_from_settings(settings):
     """ Factory method that takes a dict, finds keys prefixed with
     'postmonkey.', and uses them to create a new ``PostMonkey`` instance.
     Intended for use with console scripts or web frameworks that load config
     file data into a dict.
     """
-    pm_keys = filter(lambda k: k.startswith('postmonkey.'), settings)
+    pm_keys = [k for k in settings if k.startswith('postmonkey.')]
     pm_opts = {}
     for key in pm_keys:
         param = key.split('.')[-1]

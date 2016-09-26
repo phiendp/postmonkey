@@ -1,5 +1,6 @@
 import unittest
 
+
 class TestPostMonkey(unittest.TestCase):
     def _makeOne(self, settings={}):
         from . import PostMonkey
@@ -25,10 +26,10 @@ class TestPostMonkey(unittest.TestCase):
 
     def test_serialize_valid_payload(self):
         import json
-        from urllib import unquote
-        settings = {'default1':'', 'default2':''}
+        from urllib.parse import unquote
+        settings = {'default1': '', 'default2': ''}
         inst = self._makeOne(settings)
-        payload = {'param1':'', 'param2':''}
+        payload = {'param1': '', 'param2': ''}
         serialized = unquote(inst._serialize_payload(payload))
         expected_dict = dict(default1='', default2='', param1='', param2='')
         deserialized_json = json.loads(serialized)
@@ -37,16 +38,16 @@ class TestPostMonkey(unittest.TestCase):
     def test_serialize_invalid_payload(self):
         from .exceptions import SerializationError
         inst = self._makeOne()
-        payload = { 'invalid_param': object() }
+        payload = {'invalid_param': object()}
         self.assertRaises(SerializationError,
                           inst._serialize_payload, payload)
 
     def test_payload_takes_precedence(self):
         import json
-        from urllib import unquote
-        settings = {'default1':'', 'default2':''}
+        from urllib.parse import unquote
+        settings = {'default1': '', 'default2': ''}
         inst = self._makeOne(settings)
-        payload = {'default1':'overriden'}
+        payload = {'default1': 'overriden'}
         serialized = inst._serialize_payload(payload)
         deserialized = json.loads(unquote(serialized))
         self.assertEqual(deserialized['default1'], 'overriden')
@@ -141,8 +142,8 @@ class Test_postmonkey_from_settings(unittest.TestCase):
         return postmonkey_from_settings(settings)
 
     def test_it(self):
-        settings = {'postmonkey.apikey':'apikey', 'postmonkey.included': '',
-                    'ignored':''}
+        settings = {'postmonkey.apikey': 'apikey', 'postmonkey.included': '',
+                    'ignored': ''}
         inst = self._makeOne(settings)
         self.assertEqual(inst.apikey, 'apikey')
         self.assertIn('included', inst.params)
@@ -153,13 +154,15 @@ class DummyResponse(object):
     def __init__(self, text):
         self.text = text
 
+
 def dummy_post_request(url, data='', headers={}, timeout=None):
     import json
-    from urllib import unquote
+    from urllib.parse import unquote
     params = json.loads(unquote(data))
     resp = {'received': params}
     json = json.dumps(resp)
     return DummyResponse(json)
+
 
 def dummy_post_exc(*args, **kwargs):
     import json
